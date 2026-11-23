@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin E-Agenda Surat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: Inter, sans-serif;
+      background: #09090b;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-zinc-100">
+  <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+    
+    <header class="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <p class="text-[10px] tracking-[.25em] text-blue-400 font-bold uppercase">Rutan Kelas IIB Barabai</p>
+        <h1 class="text-2xl font-extrabold mt-2">ADMIN <span class="text-blue-500">E-AGENDA</span></h1>
+        <p class="text-xs text-zinc-500 mt-1">Persetujuan permintaan edit arsip</p>
+      </div>
+      <a href="<?= baseUrl ?>" class="text-xs font-bold text-blue-300 underline">Kembali ke E-Agenda</a>
+    </header>
+
+    <section id="login-panel" class="max-w-md mx-auto rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 space-y-4">
+      <div>
+        <h2 class="font-bold text-lg">Autentikasi Admin</h2>
+        <p class="text-xs text-zinc-500 mt-1">Masukkan PIN admin untuk mengakses antrean permintaan.</p>
+      </div>
+      <label class="block text-xs text-zinc-400">
+        PIN Admin
+        <input id="admin-pin" type="password" autocomplete="current-password" class="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-blue-500">
+      </label>
+      <button onclick="loginAdmin()" class="w-full rounded-xl bg-blue-600 hover:bg-blue-500 py-3 text-xs font-bold">MASUK ADMIN</button>
+      <p id="login-message" class="text-xs text-rose-400"></p>
+    </section>
+
+    <section id="dashboard" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-bold">Antrean Permintaan Edit</h2>
+          <p class="text-xs text-zinc-500 mt-1">Admin hanya menyetujui atau menolak. Pengguna hanya bisa mengubah Tujuan dan Perihal.</p>
+        </div>
+        <button onclick="loadRequests()" class="rounded-xl border border-zinc-700 px-4 py-2 text-xs font-bold hover:bg-zinc-800">MUAT ULANG</button>
+      </div>
+      <div id="requests" class="grid gap-3"></div>
+      <p id="dashboard-message" class="text-xs text-zinc-400"></p>
+    </section>
+
+      
+      <!-- MODAL KONFIRMASI KEPUTUSAN ADMIN -->
+      <div id="decision-modal"
+          class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-3xl border border-zinc-700 bg-zinc-900 p-6 shadow-2xl">
+          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-500/10">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="28" height="28" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"
+                class="text-blue-400">
+              <path d="M12 9v4"/>
+              <path d="M12 17h.01"/>
+              <circle cx="12" cy="12" r="10"/>
+            </svg>
+          </div>
+
+          <h3 id="decision-title"
+              class="text-center text-lg font-extrabold text-white">
+            Konfirmasi Keputusan
+          </h3>
+
+          <p id="decision-description"
+            class="mt-2 text-center text-sm leading-relaxed text-zinc-400">
+            Periksa kembali keputusan sebelum melanjutkan.
+          </p>
+
+          <div class="mt-5 rounded-xl border border-zinc-800 bg-zinc-950 p-3">
+            <p class="text-[10px] uppercase tracking-widest text-zinc-500">
+              Nomor Permintaan
+            </p>
+            <p id="decision-request-id"
+              class="mt-1 break-all font-mono text-xs text-blue-300"></p>
+          </div>
+
+          <div class="mt-6 flex gap-3">
+            <button type="button" onclick="closeDecisionModal()"
+                    class="flex-1 rounded-xl border border-zinc-700 px-4 py-3 text-xs font-bold text-zinc-300 hover:bg-zinc-800">
+              BATAL
+            </button>
+
+            <button id="decision-confirm-btn" type="button"
+                    onclick="confirmDecision()"
+                    class="flex-1 rounded-xl bg-emerald-600 px-4 py-3
+                          text-xs font-bold text-white hover:bg-emerald-500">
+              YA, SETUJUI
+            </button>
+          </div>
+        </div>
+      </div>
+      </main>
+
+      <script>
+
+    let adminPin = '';
+
+    function loginAdmin() {
+      const pin = document.getElementById('admin-pin').value.trim();
+      if (!pin) {
+        document.getElementById('login-message').innerText = 'PIN wajib diisi.';
+        return;
+      }
+      
+      adminPin = pin;
+      
+      google.script.run
+        .withSuccessHandler(r => {
+          if (!r || !r.success) {
+            adminPin = '';
+            document.getElementById('login-message').innerText = (r && r.message) || 'Autentikasi gagal.';
+            return;
+          }
+          document.getElementById('login-panel').classList.add('hidden');
+          document.getElementById('dashboard').classList.remove('hidden');
+          loadRequests();
+        })
+        .withFailureHandler(e => {
+          adminPin = '';
+          document.getElementById('login-message').innerText = e.message || String(e);
+        })
+        .adminAuthenticate(pin);
+    }
+
+    function loadRequests() {
+      google.script.run
+        .withSuccessHandler(r => {
+          if (!r || !r.success) {
+            document.getElementById('dashboard-message').innerText = (r && r.message) || 'Gagal memuat data.';
+            return;
+          }
+          const root = document.getElementById('requests');
+          if (!r.requests.length) {
+            root.innerHTML = '<div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center text-sm text-zinc-500">Tidak ada permintaan edit.</div>';
+            return;
+          }
+          
+          root.innerHTML = r.requests.map(x => `
+            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div class="space-y-2 min-w-0">
+                  <div class="flex flex-wrap gap-2">
+                    <span class="rounded-md bg-blue-950 px-2 py-1 text-[10px] font-bold text-blue-300">${esc(x.status)}</span>
+                    <span class="text-[10px] text-zinc-500 mono">${esc(x.requestId)}</span>
+                  </div>
+                  <div class="text-sm font-bold text-blue-300 break-all">${esc(x.nomorSurat)}</div>
+                  <div class="text-xs text-zinc-400">Diajukan: ${esc(x.createdAt)} &middot; Pemohon: ${esc(x.requester || 'Tidak tersedia')}</div>
+                </div>
+                <div class="flex gap-2 shrink-0">
+                  <button ${x.status !== 'PENDING' ? 'disabled' : ''} onclick="decide('${escAttr(x.requestId)}', 'APPROVED')" class="rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-bold disabled:opacity-30">SETUJUI</button>
+                  <button ${x.status !== 'PENDING' ? 'disabled' : ''} onclick="decide('${escAttr(x.requestId)}', 'REJECTED')" class="rounded-lg border border-rose-500/40 px-3 py-2 text-[10px] font-bold text-rose-300 disabled:opacity-30">TOLAK</button>
+                </div>
+              </div>
+            </article>
+          `).join('');
+        })
+        .withFailureHandler(e => {
+          document.getElementById('dashboard-message').innerText = e.message || String(e);
+        })
+        .adminListEditRequests(adminPin);
+    }
+
+      let pendingDecision = null;
+
+      function decide(id, decision) {
+        pendingDecision = { id: id, decision: decision };
+
+        const isApprove = decision === 'APPROVED';
+
+        document.getElementById('decision-title').innerText =
+          isApprove ? 'Setujui Permintaan Edit?' : 'Tolak Permintaan Edit?';
+
+        document.getElementById('decision-description').innerText =
+          isApprove
+            ? 'Permintaan ini akan disetujui. Pengguna dapat mengubah Tujuan dan Perihal setelah memeriksa status persetujuan.'
+            : 'Permintaan ini akan ditolak. Pengguna tidak dapat melanjutkan proses edit menggunakan permintaan ini.';
+
+        document.getElementById('decision-request-id').innerText = id;
+
+        const button = document.getElementById('decision-confirm-btn');
+
+        button.innerText = isApprove ? 'YA, SETUJUI' : 'YA, TOLAK';
+        button.className = isApprove
+          ? 'flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white hover:bg-emerald-500'
+          : 'flex-1 rounded-xl bg-rose-600 px-4 py-3 text-xs font-bold text-white hover:bg-rose-500';
+
+        const modal = document.getElementById('decision-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      function closeDecisionModal() {
+        const modal = document.getElementById('decision-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        pendingDecision = null;
+      }
+
+      function confirmDecision() {
+        if (!pendingDecision) return;
+
+        const id = pendingDecision.id;
+        const decision = pendingDecision.decision;
+        const button = document.getElementById('decision-confirm-btn');
+
+        button.disabled = true;
+        button.innerText = 'MEMPROSES...';
+
+        google.script.run
+          .withSuccessHandler(function (res) {
+            button.disabled = false;
+
+            if (!res || !res.success) {
+              button.innerText = 'COBA LAGI';
+              document.getElementById('dashboard-message').innerText =
+                (res && res.message) || 'Keputusan gagal diproses.';
+              return;
+            }
+
+            closeDecisionModal();
+
+            document.getElementById('dashboard-message').innerText =
+              res.message || 'Keputusan berhasil disimpan.';
+
+            loadRequests();
+          })
+          .withFailureHandler(function (err) {
+            button.disabled = false;
+            button.innerText = 'COBA LAGI';
+
+            document.getElementById('dashboard-message').innerText =
+              err.message || String(err);
+          })
+          .adminDecideEditRequest(adminPin, id, decision);
+      }
+
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[c]));
+    }
+
+    function escAttr(s) {
+      return esc(s).replace(/`/g, '&#96;');
+    }
+  </script>
+</body>
+</html>
