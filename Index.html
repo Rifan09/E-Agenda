@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-AGENDA SURAT RUTAN BARABAI</title>
+  
+  <script>
+    (function() {
+      var memoryStorage = {};
+      try { localStorage.setItem('__test_storage__', '1'); localStorage.removeItem('__test_storage__'); } 
+      catch (e) {
+        Object.defineProperty(window, 'localStorage', {
+          value: {
+            getItem: function(key) { return key in memoryStorage ? memoryStorage[key] : null; },
+            setItem: function(key, value) { memoryStorage[key] = String(value); },
+            removeItem: function(key) { delete memoryStorage[key]; },
+            clear: function() { memoryStorage = {}; },
+            key: function(index) { return Object.keys(memoryStorage)[index] || null; },
+            get length() { return Object.keys(memoryStorage).length; }
+          }, writable: true, configurable: true
+        });
+      }
+    })();
+  </script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } } }
+  </script>
+
+  <style type="text/css">
+    body { font-family: 'Inter', sans-serif; background-color: #09090b; }
+    .bento-grid-bg { background-image: radial-gradient(circle at 50% 0px, rgba(37, 99, 235, 0.08) 0%, transparent 40%), radial-gradient(circle at 0px 50%, rgba(37, 99, 235, 0.03) 0%, transparent 25%), radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.03) 0%, transparent 30%); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+  <!-- Choices.js CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+<!-- Choices.js JS -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<style>
+  /* Kustomisasi agar warnanya senada dengan tema Dark */
+  .choices__inner { background-color: #09090b !important; border: 1px solid #27272a !important; border-radius: 0.75rem !important; min-height: 48px !important; }
+  .choices__list--dropdown { background-color: #18181b !important; border: 1px solid #27272a !important; }
+  .choices__item { color: #f4f4f5 !important; }
+  .choices__item--selectable { color: #a1a1aa !important; }
+  .choices__item--selectable:hover { background-color: #2563eb !important; color: white !important; }
+  .choices[data-type*=select-one]:after { border-color: #52525b transparent transparent transparent; }
+
+      #edit-request-modal,
+      #whatsapp-admin-modal {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      box-sizing: border-box;
+    }
+
+      #edit-request-modal:not(.hidden),
+      #whatsapp-admin-modal:not(.hidden) {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+</style>
+</head>
+<body class="min-h-screen text-zinc-100 bento-grid-bg relative selection:bg-blue-600 selection:text-white flex flex-col justify-between">
+
+  <!-- BACKGROUND GLOW -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/3 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- MODAL SUKSES -->
+  <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-[2rem] max-w-md w-full p-6 md:p-8 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden transform scale-95 transition-all duration-300">
+      <div class="absolute -top-12 -right-12 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl"></div>
+      <div class="flex flex-col items-center text-center space-y-6">
+        <div class="h-16 w-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+          <i data-lucide="check-circle-2" class="h-10 w-10"></i>
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-xl font-black text-white tracking-tight uppercase">Agenda Sukses Terbit!</h3>
+          <p class="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">E-Agenda Rutan Kelas IIB Barabai</p>
+        </div>
+        <div onclick="copyModalSerialNumber()" class="w-full bg-zinc-950/80 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center relative cursor-pointer hover:border-zinc-700 active:scale-98 transition group" title="Klik untuk menyalin">
+          <span class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1"><i data-lucide="copy" class="h-3 w-3 text-zinc-600"></i> KLIK UNTUK MENYALIN</span>
+          <span id="modal-nomor-surat" class="text-lg font-mono font-bold text-blue-400 tracking-tight break-all"></span>
+          <span id="modal-copy-toast" class="absolute bottom-2 bg-emerald-600 text-white font-bold text-[9px] px-2 py-0.5 rounded-md opacity-0 transition-opacity duration-150">TERSALIN!</span>
+        </div>
+        <button onclick="closeSuccessModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/20 active:scale-95 text-xs uppercase tracking-wider">KEMBALI KE DASHBOARD</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-6 md:py-8 space-y-6 w-full flex-1">
+    
+    <!-- HEADER -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="bg-zinc-900/40 border border-zinc-800 p-6 rounded-[2rem] lg:col-span-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-2xl group-hover:bg-blue-600/10 transition-all duration-500"></div>
+        <div class="flex items-center gap-4 z-10">
+          <!-- LOGO IMIPAS DENGAN LINK TERBARU -->
+          <img src="https://lh3.googleusercontent.com/d/1O60YiDLtqvsaNa43EHCWi1VyiE2wLaMX" alt="Logo IMIPAS" class="h-12 w-auto object-contain rounded-xl shadow-[0_0_25px_rgba(37,99,235,0.25)] shrink-0 bg-zinc-950 p-1 border border-zinc-800">
+          <div>
+            <h1 class="text-xl font-bold tracking-tight text-white">E-AGENDA <span class="text-blue-500 underline decoration-2 underline-offset-4 uppercase">SURAT MENYURAT</span></h1>
+            <p class="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">RUTAN KELAS IIB BARABAI</p>
+          </div>
+        </div>
+        <div class="bg-zinc-950/80 px-4 py-2.5 rounded-2xl border border-zinc-800 flex items-center gap-3 z-10 min-w-[220px] justify-between shadow-inner">
+          <i data-lucide="clock" class="h-5 w-5 text-blue-500 animate-pulse shrink-0"></i>
+          <div class="text-right">
+            <p id="current-date-label" class="text-xs font-semibold text-zinc-400 leading-none">Memuat Hari...</p>
+            <p id="current-time-label" class="text-sm font-bold font-mono text-white mt-1 leading-none tracking-wider">00:00:00 WIB</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2rem] lg:col-span-4 flex items-center justify-between relative overflow-hidden group">
+        <div class="space-y-1">
+          <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block font-mono">Total Arsip Sistem</span>
+          <span id="stats-total-agenda" class="text-3xl font-black text-white">0</span>
+          <!-- Link Lampiran -->
+    <a href="https://drive.google.com/file/d/1AnsQ8FPCjl64OFJYOYo7gcVXYFhInoY6/view" target="_blank" class="text-[9px] text-blue-400 hover:text-blue-300 underline uppercase tracking-wider flex items-center gap-1">
+      <i data-lucide="external-link" class="h-3 w-3"></i> LIHAT KODE
+    </a>
+          <span class="text-[10px] text-blue-400 font-mono block">Semua Klasifikasi</span>
+        </div>
+        <div class="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+          <i data-lucide="folder-open" class="h-6 w-6"></i>
+        </div>
+      </div>
+    </div>
+
+
+  <!-- MODAL PERMINTAAN / EDIT ARSIP -->
+  <div id="edit-request-modal" class="fixed inset-0 z-[90] hidden min-h-dvh w-screen items-center justify-center overflow-y-auto bg-black/90 p-4 backdrop-blur-md">
+    <div class="w-full max-w-xl rounded-3xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-4 mb-5">
+        <div><h3 id="edit-modal-title" class="text-lg font-bold text-white">Permintaan Edit Arsip</h3>
+        <p class="text-xs text-zinc-500 mt-1">Edit hanya dapat dilakukan setelah disetujui admin.</p></div>
+        <button type="button" onclick="closeEditModal()" class="rounded-lg border border-zinc-700 px-3 py-1 text-zinc-300 hover:bg-zinc-800">✕</button>
+      </div>
+      <div class="rounded-xl border border-zinc-800 bg-zinc-950 p-3 mb-4 text-xs">
+        <div class="text-zinc-500 mb-1">Nomor Surat</div><div id="edit-nomor-surat" class="font-mono font-bold text-blue-400 break-all"></div>
+      </div>
+      <div id="edit-request-state" class="text-sm text-zinc-300 mb-4">Ajukan permintaan kepada admin untuk mengedit arsip ini.</div>
+      <div id="edit-fields" class="hidden space-y-4">
+        <div><label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5">Tujuan</label><input id="edit-tujuan" maxlength="500" class="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-blue-500"></div>
+        <div><label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5">Perihal</label><textarea id="edit-perihal" maxlength="2000" rows="4" class="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-blue-500"></textarea></div>
+      </div>
+      <div class="flex flex-wrap justify-end gap-2 mt-6">
+        <button type="button" onclick="closeEditModal()" class="rounded-xl border border-zinc-700 px-4 py-3 text-xs font-bold text-zinc-300">BATAL</button>
+        <button id="edit-request-btn" type="button" onclick="submitEditRequest()" class="rounded-xl bg-blue-600 px-4 py-3 text-xs font-bold text-white hover:bg-blue-500">AJUKAN PERMINTAAN</button>
+        <button id="edit-check-btn" type="button" onclick="checkEditApproval()" class="hidden rounded-xl border border-blue-500/40 px-4 py-3 text-xs font-bold text-blue-300">CEK PERSETUJUAN</button>
+        <button id="edit-save-btn" type="button" onclick="saveApprovedEdit()" class="hidden rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white hover:bg-emerald-500">SIMPAN PERUBAHAN</button>
+      </div>
+    </div>
+  </div>
+
+        <!-- MODAL HUBUNGI ADMIN VIA WHATSAPP -->
+      <div id="whatsapp-admin-modal"
+          class="fixed inset-0 z-[100] hidden min-h-dvh w-screen items-center justify-center overflow-y-auto bg-black/90 p-4 backdrop-blur-md">
+
+        <div class="w-full max-w-md rounded-3xl border border-zinc-700 bg-zinc-900 p-6 shadow-2xl">
+
+          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="30" height="30" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"
+                class="text-emerald-400">
+              <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 
+                      8.5 8.5 0 0 1-7.6 4.7
+                      8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7
+                      a8.4 8.4 0 0 1-.9-3.8
+                      8.5 8.5 0 0 1 4.7-7.6
+                      8.4 8.4 0 0 1 3.8-.9h.5
+                      a8.5 8.5 0 0 1 8 8z"/>
+            </svg>
+          </div>
+
+          <h3 class="text-center text-xl font-extrabold text-white">
+            Permintaan Berhasil Dikirim
+          </h3>
+
+          <p class="mt-2 text-center text-sm leading-relaxed text-zinc-400">
+            Silakan hubungi admin E-Agenda melalui WhatsApp agar permintaan
+            edit arsip dapat segera diperiksa dan ditindaklanjuti.
+          </p>
+
+          <div class="mt-5 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+            <div>
+              <p class="text-[10px] uppercase tracking-widest text-zinc-500">
+                Nomor Surat
+              </p>
+              <p id="wa-nomor-surat"
+                class="mt-1 break-all font-mono text-sm font-bold text-blue-400"></p>
+            </div>
+
+            <div>
+              <p class="text-[10px] uppercase tracking-widest text-zinc-500">
+                ID Permintaan
+              </p>
+              <p id="wa-request-id"
+                class="mt-1 break-all font-mono text-xs text-zinc-300"></p>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3">
+            <button id="wa-admin-button" type="button"
+                    onclick="contactAdminWhatsApp()"
+                    class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-500">
+              HUBUNGI ADMIN VIA WHATSAPP
+            </button>
+
+            <button type="button" onclick="closeWhatsAppAdminModal()"
+                    class="w-full rounded-xl border border-zinc-700 px-4 py-3 text-xs font-bold text-zinc-300 hover:bg-zinc-800">
+              TUTUP
+            </button>
+          </div>
+
+          <p class="mt-4 text-center text-[10px] leading-relaxed text-zinc-500">
+            Persetujuan tetap dilakukan oleh admin melalui sistem E-Agenda.
+          </p>
+        </div>
+      </div>
+
+    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- FORM REGISTRASI -->
+      <div class="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-6 lg:col-span-5 h-fit flex flex-col gap-6 relative overflow-hidden">
+        <div>
+          <h2 class="text-xl font-bold text-white">Registrasi Agenda</h2>
+          <p class="text-zinc-500 text-xs mt-1">Nomor otomatis terpisah per kode klasifikasi.</p>
+        </div>
+
+        <form id="agendaForm" onsubmit="handleSaveAgenda(event)" class="space-y-4 text-xs">
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Nama Petugas Penginput</label>
+            <input type="text" id="form-agenda-petugas" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all placeholder:text-zinc-700 text-zinc-100 uppercase" placeholder="CONTOH: BUDI SANTOSO">
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Klasifikasi Surat</label>
+            <div class="relative">
+              <select id="form-agenda-klasifikasi" required onchange="updateLivePreview()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-blue-500 transition-all text-zinc-100">
+                <option value="">-- MEMUAT KLASIFIKASI... --</option>
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">▼</div>
+            </div>
+          </div>
+          <!-- DROPDOWN FORMAT NOMOR -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pilih Format Nomor</label>
+            <select 
+              id="form-format-nomor"
+              onchange="handleFormatChange()"
+              class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all text-zinc-100"
+            >
+              <option value="1">NASKAH SURAT PERINTAH: WP.19.PAS.9/[KLASIFIKASI]/[ID]</option>
+              <option value="2">NASKAH SURAT KEPUTUSAN: WP.19.PAS.9/[ID]/[KLASIFIKASI]/[TAHUN]</option>
+              <option value="3">NASKAH KORESPONDENSI INTERNAL: WP.19.PAS.9/[KLASIFIKASI]/[ID]/[TAHUN]</option>
+              <option value="4">NASKAH KORESPONDENSI EKSTERNAL: WP.19.PAS.9/[KLASIFIKASI KEAMANAN]/[KLASIFIKASI]/[ID]/[TAHUN]</option>
+              <option value="5">NASKAH DINAS KHUSUS: WP.19.PAS.9/[KLASIFIKASI]/[ID]/[TAHUN]</option>
+              <option value="6">NASKAH FORMAT SOP: WP.19.PAS.9/[ID]/[KLASIFIKASI]/[TAHUN]</option>
+            </select>
+          </div>
+
+          <!-- DROPDOWN KLASIFIKASI KEAMANAN -->
+          <div id="container-klasifikasi-keamanan" class="space-y-1.5 hidden">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              Klasifikasi Keamanan
+            </label>
+
+            <select
+              id="form-klasifikasi-keamanan"
+              onchange="handleFormatChange()"
+              class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all text-zinc-100"
+            >
+              <option value="">-- PILIH KLASIFIKASI KEAMANAN --</option>
+              <option value="SR">SANGAT RAHASIA - SR</option>
+              <option value="R">RAHASIA - R</option>
+              <option value="T">TERBATAS - T</option>
+              <option value="B">BIASA - B</option>
+            </select>
+          </div>
+
+          <div class="bg-blue-600 rounded-2xl p-5 flex flex-col justify-between text-white shadow-xl shadow-blue-950/30 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+            <div class="flex justify-between items-center mb-1">
+              <p class="text-[9px] font-bold uppercase tracking-widest opacity-80">Nomor Surat Berikutnya</p>
+              <span class="text-[10px] font-mono opacity-80">2026</span>
+            </div>
+            <div>
+              <h4 id="form-live-preview-box" class="text-base font-mono font-bold leading-tight tracking-tight break-all">WP.19.PAS.9.[KLASIFIKASI].[URUTAN]</h4>
+              <p class="text-[9px] mt-1 opacity-75 italic">Diperbarui otomatis saat klasifikasi dipilih</p>
+            </div>
+          </div>
+
+          <!-- DROPDOWN ASAL SURAT -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Asal Surat</label>
+            <div class="relative">
+              <select id="form-agenda-asalsurat" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-blue-500 transition-all text-zinc-100">
+                <option value="">-- MEMUAT ASAL SURAT... --</option>
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">▼</div>
+            </div>
+          </div>
+
+          <!-- DROPDOWN SIFAT SURAT -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Sifat Surat</label>
+            <div class="relative">
+              <select id="form-agenda-sifatsurat" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-blue-500 transition-all text-zinc-100">
+                <option value="">-- MEMUAT SIFAT SURAT... --</option>
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">▼</div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Ditujukan Kepada</label>
+            <input type="text" id="form-agenda-tujuan" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all placeholder:text-zinc-700 text-zinc-100 uppercase" placeholder="CONTOH: KEPALA KANWIL">
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Uraian Perihal</label>
+            <textarea id="form-agenda-perihal" required rows="3" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all placeholder:text-zinc-700 resize-none leading-normal text-zinc-100 uppercase" placeholder="CONTOH: LAPORAN BULANAN..."></textarea>
+          </div>
+
+          <button type="submit" id="form-agenda-submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-900/20 active:scale-95 text-xs uppercase">SIMPAN AGENDA & CETAK NOMOR</button>
+        </form>
+      </div>
+      <!-- ===================================================== -->
+      <!-- KOLOM KANAN: ARSIP JURNAL DAN REFERENSI -->
+      <!-- ===================================================== -->
+      <div class="lg:col-span-7 flex flex-col gap-5">
+
+        <!-- ===================================================== -->
+        <!-- ARSIP DATABASE -->
+        <!-- ===================================================== -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-6 flex flex-col min-h-[500px]">
+
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <div>
+              <h3 class="font-bold text-lg text-white">Arsip Jurnal Surat</h3>
+              <p class="text-[10px] text-zinc-500 font-mono mt-0.5">
+                Seluruh Arsip Agenda Di Spreadsheet
+              </p>
+            </div>
+
+            <button onclick="exportToCSV()"
+              class="bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-500/20 text-emerald-400 font-bold py-1.5 px-3 rounded-lg text-[10px] tracking-wide transition flex items-center gap-1 active:scale-95">
+              <i data-lucide="file-spreadsheet" class="h-3.5 w-3.5"></i>
+              EXPORT EXCEL (CSV)
+            </button>
+          </div>
+
+          <!-- SEARCH & FILTER -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+
+            <!-- PENCARIAN -->
+            <div class="relative md:col-span-2">
+              <i data-lucide="search"
+                class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500"></i>
+
+              <input type="text"
+                id="table-search-input"
+                placeholder="Cari nomor surat, perihal, tujuan, atau petugas..."
+                oninput="applyFilters()"
+                class="bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-blue-500 transition">
+            </div>
+
+            <!-- FILTER KLASIFIKASI -->
+            <select id="table-filter-klasifikasi"
+              onchange="applyFilters()"
+              class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-blue-500 transition appearance-none">
+              <option value="">Semua Klasifikasi</option>
+            </select>
+
+            <!-- FILTER TANGGAL -->
+            <input type="date"
+              id="table-filter-tanggal"
+              onchange="applyFilters()"
+              class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-blue-500 transition">
+
+            <!-- FILTER BULAN -->
+            <select id="table-filter-bulan"
+              onchange="applyFilters()"
+              class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-blue-500 transition appearance-none">
+              <option value="">Semua Bulan</option>
+              <option value="01">Januari</option>
+              <option value="02">Februari</option>
+              <option value="03">Maret</option>
+              <option value="04">April</option>
+              <option value="05">Mei</option>
+              <option value="06">Juni</option>
+              <option value="07">Juli</option>
+              <option value="08">Agustus</option>
+              <option value="09">September</option>
+              <option value="10">Oktober</option>
+              <option value="11">November</option>
+              <option value="12">Desember</option>
+            </select>
+
+            <!-- FILTER TAHUN -->
+            <select id="table-filter-tahun"
+              onchange="applyFilters()"
+              class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-blue-500 transition appearance-none">
+              <option value="">Semua Tahun</option>
+            </select>
+          </div>
+
+          <!-- TOMBOL RESET FILTER -->
+          <div class="flex justify-end mb-4">
+            <button type="button"
+              onclick="resetArchiveFilters()"
+              class="text-xs text-zinc-500 hover:text-blue-400 transition flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              Reset Filter
+            </button>
+          </div>
+
+          <!-- TABEL ARSIP -->
+          <div class="flex-1 overflow-x-auto border border-zinc-800/50 rounded-xl bg-zinc-950/60 max-h-[410px]">
+            <table class="w-full text-left border-collapse text-xs min-w-[600px]">
+              <thead>
+                <tr class="bg-zinc-900 border-b border-zinc-800 text-zinc-500 font-bold uppercase tracking-wider sticky top-0 z-10">
+                  <th class="p-3 text-center w-10 font-mono">No</th>
+                  <th class="p-3">Nomor Surat Keluar</th>
+                  <th class="p-3">Tujuan & Perihal</th>
+                  <th class="p-3 text-right pr-4">Petugas</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody id="agenda-table-body" class="divide-y divide-zinc-800/40">
+                <tr>
+                  <td colspan="5" class="p-8 text-center text-zinc-600">
+                    Menyinkronkan database...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        <!-- ===================================================== -->
+        <!-- REFERENSI TATA NASKAH DAN KODEFIKASI -->
+        <!-- ===================================================== -->
+        <div class="mt-1">
+
+          <div class="mb-4">
+            <h3 class="text-sm font-bold text-white">
+              Referensi & Pedoman Surat
+            </h3>
+            <p class="text-xs text-zinc-500 mt-1">
+              Akses dokumen resmi tata naskah dan kodefikasi surat.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- TATA NASKAH DINAS -->
+            <a href="https://drive.google.com/file/d/11t8XucGUuAM1hxPudIz-vZcPiAJ3_2zm/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex items-center gap-4 p-5 rounded-2xl
+                    bg-rose-600/10 border border-rose-500/20
+                    hover:bg-rose-600/20 hover:border-rose-500/50
+                    transition-all duration-200">
+
+              <div class="flex items-center justify-center w-12 h-12 shrink-0 rounded-xl bg-rose-600 text-white">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-sm text-white">
+                  Tata Naskah Dinas
+                </h4>
+                <p class="text-xs text-zinc-400 mt-1">
+                  Pedoman penyusunan naskah dinas
+                </p>
+              </div>
+
+              <i data-lucide="external-link"
+                class="w-4 h-4 text-zinc-500 group-hover:text-rose-400 shrink-0"></i>
+            </a>
+
+
+            <!-- KODEFIKASI SURAT TERBARU -->
+            <a href="https://drive.google.com/file/d/1Udh1LnDmGmDM4PCE68Fzpo_f8KGLvq95/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex items-center gap-4 p-5 rounded-2xl
+                    bg-amber-500/10 border border-amber-500/20
+                    hover:bg-amber-500/20 hover:border-amber-500/50
+                    transition-all duration-200">
+
+              <div class="flex items-center justify-center w-12 h-12 shrink-0 rounded-xl bg-amber-500 text-zinc-950">
+                <i data-lucide="book-open" class="w-6 h-6"></i>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-sm text-white">
+                  Kodefikasi Surat Terbaru
+                </h4>
+                <p class="text-xs text-zinc-400 mt-1">
+                  Referensi kode klasifikasi surat
+                </p>
+              </div>
+
+              <i data-lucide="external-link"
+                class="w-4 h-4 text-zinc-500 group-hover:text-amber-400 shrink-0"></i>
+            </a>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+  <footer class="mt-12 border-t border-zinc-900 bg-zinc-950/60 py-6 text-center text-zinc-600 text-[10px] font-mono tracking-wider uppercase">
+    <div class="max-w-7xl mx-auto px-4">© 2026 E-AGENDA SURAT RUTAN BARABAI • CREATED BY MUHAMMAD YUNUS</div>
+  </footer>
+
+  <script>
+    let rawAgendas = [];
+    let rawKlasifikasi = [];
+    let rawMaxIds = {};
+    let rawAsalSurat = [];  
+    let rawSifatSurat = []; 
+    let selectedEditRecord = null;
+    let activeEditRequestId = "";
+
+
+    window.onload = function() {
+      lucide.createIcons();
+      startClock();
+      fetchDatabase();
+    };
+
+    function startClock() {
+      setInterval(() => {
+        const now = new Date();
+        document.getElementById('current-date-label').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
+        document.getElementById('current-time-label').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+      }, 1000);
+    }
+
+    function fetchDatabase() {
+      google.script.run
+        .withSuccessHandler(function(response) {
+          rawAgendas = response.agendas;
+          rawKlasifikasi = response.klasifikasis;
+          rawMaxIds = response.maxIds; 
+          rawAsalSurat = response.asalSurats || [];   
+          rawSifatSurat = response.sifatSurats || []; 
+          
+          buildDropdown(rawKlasifikasi);
+          buildFilterDropdown(rawKlasifikasi);
+          buildYearDropdown();
+
+          buildAsalSuratDropdown(rawAsalSurat);
+          buildSifatSuratDropdown(rawSifatSurat);
+
+          buildTable(rawAgendas);
+          document.getElementById('stats-total-agenda').innerText = response.totalArsip;
+          updateLivePreview();
+        })
+        .withFailureHandler(function(err) { showToast("Gagal menyinkronkan database: " + err.message, "error"); })
+        .getInitialData();
+    }
+
+    function buildDropdown(list) {
+      const selectElement = document.getElementById('form-agenda-klasifikasi');
+      if (!selectElement) return;
+      selectElement.innerHTML = '';
+      
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.text = '-- PILIH KODE KLASIFIKASI --';
+      selectElement.appendChild(defaultOption);
+      
+      if (Array.isArray(list) && list.length > 0) {
+        list.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.kode;
+          opt.text = `${item.kode} - ${item.keterangan}`;
+          selectElement.appendChild(opt);
+        });
+      }
+    }
+
+    function buildAsalSuratDropdown(list) {
+      const selectElement = document.getElementById('form-agenda-asalsurat');
+      if (!selectElement) return;
+      selectElement.innerHTML = '';
+      
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.text = '-- PILIH ASAL SURAT --';
+      selectElement.appendChild(defaultOption);
+      
+      if (Array.isArray(list) && list.length > 0) {
+        list.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.kode;
+          opt.text = `${item.kode} - ${item.instansi}`;
+          selectElement.appendChild(opt);
+        });
+      }
+    }
+
+    function buildSifatSuratDropdown(list) {
+      const selectElement = document.getElementById('form-agenda-sifatsurat');
+      if (!selectElement) return;
+      selectElement.innerHTML = '';
+      
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.text = '-- PILIH SIFAT SURAT --';
+      selectElement.appendChild(defaultOption);
+      
+      if (Array.isArray(list) && list.length > 0) {
+        list.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.sifat;
+          opt.text = `${item.sifat} - ${item.keterangan}`;
+          selectElement.appendChild(opt);
+        });
+      }
+    }
+
+    function buildFilterDropdown(list) {
+      const filter = document.getElementById('table-filter-klasifikasi');
+      let html = '<option value="">Semua Klasifikasi</option>';
+      list.forEach(item => { html += `<option value="${item.kode}">${item.kode}</option>`; });
+      filter.innerHTML = html;
+    }
+
+    
+    function buildYearDropdown() {
+      const filter = document.getElementById('table-filter-tahun');
+      const selectedYear = filter.value;
+
+      const years = [...new Set(
+        rawAgendas
+          .map(item => String(item.tanggal || '').substring(0, 4))
+          .filter(year => /^\d{4}$/.test(year))
+      )].sort((a, b) => b.localeCompare(a));
+
+      filter.innerHTML = '<option value="">Semua Tahun</option>';
+
+      years.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        filter.appendChild(option);
+      });
+
+      if (years.includes(selectedYear)) {
+        filter.value = selectedYear;
+      }
+    }
+
+
+    function applyFilters() {
+      const query = document.getElementById('table-search-input').value.toLowerCase().trim();
+
+      const filterKlas = document.getElementById('table-filter-klasifikasi').value;
+      const filterTanggal = document.getElementById('table-filter-tanggal').value;
+      const filterBulan = document.getElementById('table-filter-bulan').value;
+      const filterTahun = document.getElementById('table-filter-tahun').value;
+
+      const filtered = rawAgendas.filter(item => {
+        const tanggal = String(item.tanggal || '');
+        const tanggalSurat = tanggal.substring(0, 10);
+
+        const tahunSurat = tanggalSurat.substring(0, 4);
+        const bulanSurat = tanggalSurat.substring(5, 7);
+
+        const matchesQuery =
+          String(item.nomorSurat || '').toLowerCase().includes(query) ||
+          String(item.tujuan || '').toLowerCase().includes(query) ||
+          String(item.perihal || '').toLowerCase().includes(query) ||
+          String(item.petugas || '').toLowerCase().includes(query);
+
+        const matchesKlas =
+          filterKlas === '' || item.klasifikasi === filterKlas;
+
+        const matchesTanggal =
+          filterTanggal === '' || tanggalSurat === filterTanggal;
+
+        const matchesBulan =
+          filterBulan === '' || bulanSurat === filterBulan;
+
+        const matchesTahun =
+          filterTahun === '' || tahunSurat === filterTahun;
+
+        return matchesQuery &&
+              matchesKlas &&
+              matchesTanggal &&
+              matchesBulan &&
+              matchesTahun;
+      });
+
+      buildTable(filtered);
+    }
+
+
+    function resetArchiveFilters() {
+      document.getElementById('table-search-input').value = '';
+      document.getElementById('table-filter-klasifikasi').value = '';
+      document.getElementById('table-filter-tanggal').value = '';
+      document.getElementById('table-filter-bulan').value = '';
+      document.getElementById('table-filter-tahun').value = '';
+
+      applyFilters();
+    }
+
+
+    function handleFormatChange() {
+      const format = document.getElementById('form-format-nomor').value;
+      const container = document.getElementById('container-klasifikasi-keamanan');
+      const keamanan = document.getElementById('form-klasifikasi-keamanan');
+
+      // Tampilkan klasifikasi keamanan hanya untuk format 4
+      const isExternal = format === "4";
+
+      container.classList.toggle('hidden', !isExternal);
+      keamanan.required = isExternal;
+
+      if (!isExternal) {
+        keamanan.value = "";
+      }
+
+      updateLivePreview();
+    }
+
+    function updateLivePreview() {
+      const selectedKlas =
+        document.getElementById('form-agenda-klasifikasi').value;
+
+      const selectedFormat =
+        document.getElementById('form-format-nomor').value;
+
+      const selectedKeamanan =
+        document.getElementById('form-klasifikasi-keamanan').value;
+
+      const tahun = new Date().getFullYear();
+
+      const displayKlas = selectedKlas || '[KLASIFIKASI]';
+      const displayKeamanan = selectedKeamanan || '[KLASIFIKASI KEAMANAN]';
+
+      let nextId = '[URUTAN]';
+
+      if (selectedKlas) {
+        const kelompok =
+          (selectedFormat === "3" || selectedFormat === "4")
+            ? "34"
+            : selectedFormat;
+
+      const key = kelompok + "|" + selectedKlas;
+      const currentMax = Number(rawMaxIds[key]) || 0;
+
+      nextId = currentMax + 1;
+      
+      }
+
+      let preview = "";
+
+      switch (selectedFormat) {
+        case "1":
+          preview = `WP.19.PAS.9/${displayKlas}/${nextId}`;
+          break;
+
+        case "2":
+        case "6":
+          preview = `WP.19.PAS.9/${nextId}/${displayKlas}/${tahun}`;
+          break;
+
+        case "3":
+        case "5":
+          preview = `WP.19.PAS.9/${displayKlas}/${nextId}/${tahun}`;
+          break;
+
+        case "4":
+          preview = `WP.19.PAS.9/${displayKeamanan}/${displayKlas}/${nextId}/${tahun}`;
+          break;
+
+        default:
+          preview = `WP.19.PAS.9/${displayKlas}/${nextId}`;
+      }
+
+      document.getElementById('form-live-preview-box').innerText = preview;
+    }
+
+
+    // Amankan data spreadsheet sebelum dimasukkan ke HTML.
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char];
+      });
+    }
+
+    function buildTable(data) {
+      const tbody = document.getElementById('agenda-table-body');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-zinc-600 font-mono">Tidak ada data ditemukan.</td></tr>`;
+        return;
+      }
+      let html = '';
+      data.forEach(item => {
+        html += `
+          <tr class="hover:bg-zinc-900/30 transition-colors">
+            <td class="p-3 text-center font-mono text-zinc-500 font-bold border-r border-zinc-900">${escapeHtml(item.no)}</td>
+            <td class="p-3 font-mono font-bold text-blue-400 select-all tracking-tight">${escapeHtml(item.nomorSurat)}</td>
+            <td class="p-3 max-w-xs">
+              <div class="flex flex-wrap gap-1 mb-1.5">
+                <span class="text-[9px] bg-zinc-800 text-zinc-300 font-bold px-1.5 py-0.5 rounded">${escapeHtml(item.klasifikasi)}</span>
+                <span class="text-[9px] bg-blue-950/60 text-blue-400 font-bold px-1.5 py-0.5 rounded border border-blue-900/30">${escapeHtml(item.asalSurat || '-')}</span>
+                <span class="text-[9px] bg-amber-950/60 text-amber-400 font-bold px-1.5 py-0.5 rounded border border-amber-900/30">${escapeHtml(item.sifatSurat || '-')}</span>
+              </div>
+              <strong class="text-zinc-200 block mt-1 uppercase tracking-wide">${escapeHtml(item.tujuan)}</strong>
+              <p class="text-zinc-500 text-[10px] mt-0.5 uppercase leading-relaxed line-clamp-2">${escapeHtml(item.perihal)}</p>
+            </td>
+            <td class="p-3 text-right pr-4 font-semibold text-zinc-400 uppercase">
+              ${escapeHtml(item.petugas)}
+              <span class="block text-[8px] font-mono text-zinc-600 mt-0.5">${escapeHtml(item.tanggal)}</span>
+            </td>
+            <td class="p-3 text-center"><button
+                type="button"
+                onclick="openEditRequestByIndex(${rawAgendas.indexOf(item)})"
+                class="rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-[10px] font-bold text-blue-300 hover:bg-blue-500/20">
+                EDIT
+              </button></td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function handleSaveAgenda(e) {
+      e.preventDefault();
+      const btn = document.getElementById('form-agenda-submit-btn');
+      btn.disabled = true; btn.innerText = "MENYIMPAN KE CLOUD...";
+
+      const payload = {
+        
+        petugas: document.getElementById('form-agenda-petugas').value,
+        klasifikasi: document.getElementById('form-agenda-klasifikasi').value,
+        formatNomor: document.getElementById('form-format-nomor').value,
+        klasifikasiKeamanan: document.getElementById('form-klasifikasi-keamanan').value, 
+        asalSurat: document.getElementById('form-agenda-asalsurat').value,   
+        sifatSurat: document.getElementById('form-agenda-sifatsurat').value, 
+        tujuan: document.getElementById('form-agenda-tujuan').value,
+        perihal: document.getElementById('form-agenda-perihal').value
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            openSuccessModal(res.nomorSurat, payload.petugas, payload.tujuan, payload.perihal);
+            document.getElementById('agendaForm').reset();
+            handleFormatChange();
+            fetchDatabase();
+          } else {
+            showToast((res && res.message) || "Gagal mendaftarkan agenda.", "error");
+          }
+          btn.disabled = false;
+          btn.innerText = "SIMPAN AGENDA & CETAK NOMOR";
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.innerText = "SIMPAN AGENDA & CETAK NOMOR";
+          showToast("Kesalahan server: " + (err && err.message ? err.message : String(err)), "error");
+        })
+        .addAgendaRecord(payload);
+    }
+
+    function openEditRequestByIndex(index) {
+      const item = rawAgendas[index];
+
+      if (!item) {
+        showToast("Arsip tidak ditemukan. Muat ulang halaman.", "error");
+        return;
+      }
+
+      openEditRequest(item.nomorSurat);
+    }
+        // Alur edit: pengguna mengajukan permintaan, admin menyetujui dari Admin.html,
+    // lalu pengguna memeriksa status dan hanya dapat mengubah Tujuan + Perihal.
+    function openEditRequest(nomorSurat) {
+      selectedEditRecord = rawAgendas.find(x => String(x.nomorSurat) === String(nomorSurat));
+      if (!selectedEditRecord) return showToast("Arsip tidak ditemukan. Muat ulang halaman.", "error");
+      activeEditRequestId = "";
+      document.getElementById('edit-nomor-surat').innerText = selectedEditRecord.nomorSurat;
+      document.getElementById('edit-request-state').innerText = "Ajukan permintaan kepada admin untuk mengedit arsip ini. Setelah disetujui, klik Cek Persetujuan.";
+      document.getElementById('edit-fields').classList.add('hidden');
+      document.getElementById('edit-request-btn').classList.remove('hidden');
+      document.getElementById('edit-check-btn').classList.add('hidden');
+      document.getElementById('edit-save-btn').classList.add('hidden');
+      document.getElementById('edit-modal-title').innerText = "Permintaan Edit Arsip";
+      const modal = document.getElementById('edit-request-modal'); modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById('edit-request-modal'); modal.classList.add('hidden'); modal.classList.remove('flex');
+    }
+
+
+    const NOMOR_WHATSAPP_ADMIN = '6282132924074'; // GANTI dengan nomor admin
+
+    function showWhatsAppAdminModal(nomorSurat, requestId) {
+      document.getElementById('wa-nomor-surat').innerText = nomorSurat;
+      document.getElementById('wa-request-id').innerText = requestId;
+
+      const modal = document.getElementById('whatsapp-admin-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeWhatsAppAdminModal() {
+      const modal = document.getElementById('whatsapp-admin-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function contactAdminWhatsApp() {
+      const nomorAdmin = NOMOR_WHATSAPP_ADMIN.replace(/\D/g, '');
+
+      if (!nomorAdmin || nomorAdmin === '6281234567890') {
+        showToast('Silakan isi nomor WhatsApp admin terlebih dahulu.', 'warning');
+        return;
+      }
+
+      const nomorSurat = document.getElementById('wa-nomor-surat').innerText;
+      const requestId = document.getElementById('wa-request-id').innerText;
+
+      const pesan =
+        'Halo Admin E-Agenda Rutan Barabai, saya telah mengajukan permintaan edit arsip.\n\n' +
+        'Nomor Surat: ' + nomorSurat + '\n' +
+        'ID Permintaan: ' + requestId + '\n\n' +
+        'Mohon bantuannya untuk memeriksa dan menindaklanjuti permintaan tersebut. Terima kasih.';
+
+      const url = 'https://wa.me/' + nomorAdmin + '?text=' +
+                  encodeURIComponent(pesan);
+
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+
+    function submitEditRequest() {
+      if (!selectedEditRecord) return;
+      const btn = document.getElementById('edit-request-btn'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+      google.script.run.withSuccessHandler(res => {
+        btn.disabled = false; btn.innerText = "AJUKAN PERMINTAAN";
+        if (!res || !res.success) return showToast((res && res.message) || "Permintaan gagal dibuat.", "error");
+        activeEditRequestId = res.requestId;
+
+        showWhatsAppAdminModal(
+          selectedEditRecord.nomorSurat,
+          activeEditRequestId
+        );
+        
+        document.getElementById('edit-request-btn').classList.add('hidden');
+        document.getElementById('edit-check-btn').classList.remove('hidden');
+        showToast("Permintaan edit dikirim ke antrean admin.", "success");
+      }).withFailureHandler(err => { btn.disabled = false; btn.innerText = "AJUKAN PERMINTAAN"; showToast(err.message || String(err), "error"); }).createEditRequest(selectedEditRecord.nomorSurat);
+    }
+
+    function checkEditApproval() {
+      if (!activeEditRequestId) return showToast("ID permintaan belum tersedia.", "error");
+      google.script.run.withSuccessHandler(res => {
+        if (!res || !res.success) return showToast((res && res.message) || "Gagal memeriksa status.", "error");
+        document.getElementById('edit-request-state').innerText = "Status: " + res.status + (res.message ? " — " + res.message : "");
+        if (res.status === "APPROVED") {
+          document.getElementById('edit-fields').classList.remove('hidden');
+          document.getElementById('edit-tujuan').value = selectedEditRecord.tujuan || "";
+          document.getElementById('edit-perihal').value = selectedEditRecord.perihal || "";
+          document.getElementById('edit-save-btn').classList.remove('hidden');
+          document.getElementById('edit-modal-title').innerText = "Edit Tujuan & Perihal";
+        }
+      }).withFailureHandler(err => showToast(err.message || String(err), "error")).getEditRequestStatus(activeEditRequestId);
+    }
+    function saveApprovedEdit() {
+      const tujuan = document.getElementById('edit-tujuan').value.trim();
+      const perihal = document.getElementById('edit-perihal').value.trim();
+      if (!tujuan || !perihal) return showToast("Tujuan dan perihal wajib diisi.", "warning");
+      const btn = document.getElementById('edit-save-btn'); btn.disabled = true; btn.innerText = "MENYIMPAN...";
+      google.script.run.withSuccessHandler(res => {
+        btn.disabled = false; btn.innerText = "SIMPAN PERUBAHAN";
+        if (!res || !res.success) return showToast((res && res.message) || "Perubahan gagal disimpan.", "error");
+        showToast("Tujuan dan perihal berhasil diperbarui.", "success"); closeEditModal(); fetchDatabase();
+      }).withFailureHandler(err => { btn.disabled = false; btn.innerText = "SIMPAN PERUBAHAN"; showToast(err.message || String(err), "error"); }).saveApprovedEdit({requestId: activeEditRequestId, nomorSurat: selectedEditRecord.nomorSurat, tujuan: tujuan, perihal: perihal});
+    }
+
+    function exportToCSV() {
+      if (rawAgendas.length === 0) return showToast("Belum ada data!", "warning");
+      let csvContent = "data:text/csv;charset=utf-8,No Urut Klas,Tanggal,Nomor Surat,Klasifikasi,Asal Surat,Sifat Surat,Tujuan,Perihal,Nama Petugas\n";
+      rawAgendas.forEach(item => { csvContent += `"${escapeHtml(item.no)}","${escapeHtml(item.tanggal)}","${escapeHtml(item.nomorSurat)}","${escapeHtml(item.klasifikasi)}","${escapeHtml(item.asalSurat || '-')}","${escapeHtml(item.sifatSurat || '-')}","${item.tujuan.replace(/"/g, '""')}","${item.perihal.replace(/"/g, '""')}","${item.petugas.replace(/"/g, '""')}"\n`; });
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", `E-AGENDA_SURAT_IMIPAS_2026.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      showToast("Arsip berhasil diunduh!", "success");
+    }
+
+    function openSuccessModal(nomorSurat, petugas, tujuan, perihal) {
+      document.getElementById('modal-nomor-surat').innerText = nomorSurat;
+      const modal = document.getElementById('success-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => { modal.classList.add('opacity-100'); modal.querySelector('div').classList.remove('scale-95'); }, 50);
+    }
+    
+    function closeSuccessModal() {
+      const modal = document.getElementById('success-modal');
+      modal.classList.remove('opacity-100'); modal.querySelector('div').classList.add('scale-95');
+      setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+    
+    function copyModalSerialNumber() {
+      navigator.clipboard.writeText(document.getElementById('modal-nomor-surat').innerText).then(() => {
+        const t = document.getElementById('modal-copy-toast');
+        t.classList.remove('opacity-0'); setTimeout(() => { t.classList.add('opacity-0'); }, 1500);
+      });
+    }
+    
+    function showToast(message, type = "success") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let colors = type === "success" ? "border-emerald-500/30 text-emerald-400" : (type === "error" ? "border-rose-500/30 text-rose-400" : "border-amber-500/30 text-amber-400");
+      let icon = type === "success" ? "check-circle" : (type === "error" ? "alert-triangle" : "alert-circle");
+      toast.className = `flex items-center gap-3 p-4 rounded-2xl border bg-zinc-900/95 shadow-xl backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 ${colors}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="h-5 w-5 shrink-0"></i><span class="text-xs font-semibold text-zinc-100">${message}</span>`;
+      container.appendChild(toast); lucide.createIcons();
+      setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 50);
+      setTimeout(() => { toast.classList.add('translate-y-2', 'opacity-0'); setTimeout(() => { toast.remove(); }, 300); }, 3500);
+    }
+  </script>
+</body>
+</html>
